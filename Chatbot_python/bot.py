@@ -17,13 +17,16 @@ client = discord.Client(intents = intents)
 
 @client.event
 async def on_ready():
-    for server in client.guilds:
-        if server.name == SERVER:
-            break
+    server = discord.utils.get(client.guilds, name=SERVER)
+    
     print(f'{client.user} is connected to the following server:\n'
           f'{server.name}(id: {server.id})')
-    members = '\n - '.join([member.name for member in server.members])
-    print(f'Server\'s Members:\n - {members}')
+
+@client.event
+async def on_member_join(member):
+    await member.create_dm()
+    await member.dm_channel.send(f'Hi {member.name}, welcome to my Discord server!')
+
 
 client.run(TOKEN)
 
