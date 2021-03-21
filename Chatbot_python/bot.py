@@ -3,8 +3,11 @@
 #bot = commands.Bot(command_prefix = "!", description = "Bot test")
 
 import os
+import random
 
 import discord
+from discord.ext import commands
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,6 +17,7 @@ SERVER = os.getenv('DISCORD_SERVER')
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents = intents)
+bot = commands.Bot(command_prefix = '!')
 
 @client.event
 async def on_ready():
@@ -25,15 +29,31 @@ async def on_ready():
 @client.event
 async def on_member_join(member):
     await member.create_dm()
-    await member.dm_channel.send(f'Hi {member.name}, welcome to my Discord server!')
+    await member.dm_channel.send(
+        f'Hi {member.name}, welcome to the server made for restaurants!')
 
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+    recipes = ['Lasagna?', 'Pizza?', 'Cake?']
+    if message.content == 'recipe':
+        response = random.choice(recipes)
+        await message.channel.send(response)
+    elif message.content == 'raise-exception':
+        raise discord.DiscordException
+
+@client.event
+async def on_error(event, *args, **kwargs):
+    with open('err.log', 'a') as f:
+        if event == 'on_message':
+            f.write(f'Unhandled message: {args[0]}\n')
+        else:
+            raise()
 
 client.run(TOKEN)
 
-#@bot.event
-#async def on_ready():
-#    print("Ready!")
-#
+
 #@bot.command()
 #async def coucou(contexte):
 #    await contexte.send("Coucou !")
@@ -65,5 +85,3 @@ client.run(TOKEN)
 #
 #    reaction, user = await bot.wait_for("reaction_add", timeout = 100, check = checkEmoji)
 #
-#
-#bot.run("ODE4ODM3NjE0NTcxODE0OTEz.YEd39A.0nJbVuUdsroWF_kgJ53uA56VPJA")
