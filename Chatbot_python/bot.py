@@ -64,19 +64,42 @@ async def hello(ctx):
 
 @bot.command(name = 'menu', help = 'Affiche le menu du restaurant')
 async def menu(ctx):
-    message = await ctx.send('Voici le menu complet :', file = discord.File('menu_complet.jpg'))
+    #, file = discord.File('menu_complet.jpg')
+    await ctx.send('Voici le menu complet :', file = discord.File('menu_complet.jpg'))
+    message = await ctx.send('Si vous souhaitez accéder aux différentes cartes, veuillez cliquer sur l\'émoji concerné :\n\t🥗 : Entrées\n\t🍔 : Plats\n\t🍪 : Desserts\n\t🍷 : Vins')
     await message.add_reaction('🥗')
     await message.add_reaction('🍔')
     await message.add_reaction('🍪')
     await message.add_reaction('🍷')
     
+    def checkEmoji(reaction, user):
+        return ctx.message.author == user and message.id == reaction.message.id
+#
+    reaction, user = await bot.wait_for("reaction_add", timeout = 100, check = checkEmoji)
+    if reaction.emoji == '🥗':
+        await entrees.invoke(ctx)
+    elif reaction.emoji == '🍔':
+        await plats.invoke(ctx)
+    elif reaction.emoji == '🍪':
+        await desserts.invoke(ctx)
+    else:
+        await vins.invoke(ctx)
+    
 
 @bot.command(name = 'entrees', help = 'Affiche les entrées à la carte')
 async def entrees(ctx):
-    await ctx.send('Voici le menu complet :')
+    await ctx.send('Voici la carte des entrées :')
 
 @bot.command(name = 'plats', help = 'Affiche les plats à la carte')
 async def plats(ctx):
+    await ctx.send('Voici le menu complet :')
+    
+@bot.command(name = 'desserts', help = 'Affiche les desserts à la carte')
+async def desserts(ctx):
+    await ctx.send('Voici le menu complet :')
+    
+@bot.command(name = 'vins', help = 'Affiche les plats à la carte')
+async def vins(ctx):
     await ctx.send('Voici le menu complet :')
 
 #@bot.event
