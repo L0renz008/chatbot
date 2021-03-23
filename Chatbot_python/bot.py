@@ -4,6 +4,7 @@
 
 import os
 import random
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -44,13 +45,13 @@ async def roll(ctx, nombre_de_de: int, nombre_de_cote: int):
             for _ in range(nombre_de_de)]
     await ctx.send(', '.join(dice))
     
-@bot.command(name = 'create-channel', help = 'Créer un nouveau channel textuel. Par défaut dans la catégorie : SALONS TEXTUELS.')
+@bot.command(name = 'create-channel', brief = 'Créer un nouveau channel textuel.', help = 'Créer un nouveau channel textuel. Par défaut dans la catégorie : SALONS TEXTUELS.')
 @commands.has_role('Admin')
 async def create_channel(ctx, channel_name, category_name = 'SALONS TEXTUELS'):
     server = ctx.guild
     existing_channel = discord.utils.get(server.channels, name = channel_name)
     category = discord.utils.get(ctx.guild.categories, name = category_name)
-    print(ctx.guild.categories)
+    
     if not category:
         await ctx.send(f'{ctx.author.mention}, cette catégorie n\'existe pas. Place le channel dans une catégorie existante.')
         return
@@ -65,25 +66,35 @@ async def hello(ctx):
 @bot.command(name = 'menu', help = 'Affiche le menu du restaurant')
 async def menu(ctx):
     #, file = discord.File('menu_complet.jpg')
-    await ctx.send('Voici le menu complet :', file = discord.File('menu_complet.jpg'))
+    await ctx.send('Voici le menu complet :')
     message = await ctx.send('Si vous souhaitez accéder aux différentes cartes, veuillez cliquer sur l\'émoji concerné :\n\t🥗 : Entrées\n\t🍔 : Plats\n\t🍪 : Desserts\n\t🍷 : Vins')
     await message.add_reaction('🥗')
     await message.add_reaction('🍔')
     await message.add_reaction('🍪')
     await message.add_reaction('🍷')
     
-    def checkEmoji(reaction, user):
+    def checkUser(reaction, user):
         return ctx.message.author == user and message.id == reaction.message.id
-#
-    reaction, user = await bot.wait_for("reaction_add", timeout = 100, check = checkEmoji)
-    if reaction.emoji == '🥗':
-        await entrees.invoke(ctx)
-    elif reaction.emoji == '🍔':
-        await plats.invoke(ctx)
-    elif reaction.emoji == '🍪':
-        await desserts.invoke(ctx)
-    else:
-        await vins.invoke(ctx)
+    
+    loop = 0
+    while loop == 0:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUser)
+            if reaction.emoji == '🥗':
+                await entrees.invoke(ctx)
+                await message.remove_reaction('🥗', user)
+            elif reaction.emoji == '🍔':
+                await plats.invoke(ctx)
+                await message.remove_reaction('🍔', user)
+            elif reaction.emoji == '🍪':
+                await desserts.invoke(ctx)
+                await message.remove_reaction('🍪', user)
+            elif reaction.emoji == '🍷':
+                await vins.invoke(ctx)
+                await message.remove_reaction('🍷', user)
+        except asyncio.TimeoutError:
+            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\nRetapez la commande ***!menu*** ou l\'une des commandes ***!entrees***, ***!plats***, ***!desserts*** ou ***!vins*** si vous souhaitez accéder de nouveaux aux menus.')
+            loop = 1
     
 
 @bot.command(name = 'entrees', help = 'Affiche les entrées à la carte')
@@ -92,23 +103,25 @@ async def entrees(ctx):
 
 @bot.command(name = 'plats', help = 'Affiche les plats à la carte')
 async def plats(ctx):
-    await ctx.send('Voici le menu complet :')
+    await ctx.send('Voici la carte des plats :')
     
 @bot.command(name = 'desserts', help = 'Affiche les desserts à la carte')
 async def desserts(ctx):
-    await ctx.send('Voici le menu complet :')
+    await ctx.send('Voici la carte des desserts :')
     
-@bot.command(name = 'vins', help = 'Affiche les plats à la carte')
+@bot.command(name = 'vins', help = 'Affiche les vins à la carte')
 async def vins(ctx):
-    await ctx.send('Voici le menu complet :')
+    await ctx.send('Voici la carte des vins :')
 
-#@bot.event
-#async def on_message(message):
-#    if message.author == bot.user:
-#        return
-#    if 'menu' in message.content:
-#        await message.channel.send('Voici le menu')
-#    await bot.process_commands(message)
+@bot.command(name = 'bienvenue', help = 'Message d\'accueil')
+async def bienvenue(ctx):
+    accueil_channel_id = 823971750156304434
+    if ctx.channel.id != accueil_channel_id:
+        return
+    message = await ctx.send('Bonjour et bienvenue chez **R&L**, le restaurant où toutes les saveurs se rejoignent.\n\
+Je suis un serveur virtuel du restaurant et je vais vous accompagner tout au long de votre repas chez nous !\n\
+Veuillez cliquer sur le **numéro** de votre table s\'il vous plaît. Celui-ci est inscrit directement sur la table. Vous allez être redirigé vers le salon propre à votre table. À tout de suite 🧑‍🍳')
+    await message.add_reaction('1️⃣')
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -117,36 +130,3 @@ async def on_command_error(ctx, error):
 
 
 bot.run(TOKEN)
-
-
-#@bot.command()
-#async def coucou(contexte):
-#    await contexte.send("Coucou !")
-#
-#@bot.command()
-#async def serverInfo(contexte):
-#    server = contexte.guild
-#    numberOfTextChannels = len(server.text_channels)
-#    numberOfVoiceChannels = len(server.voice_channels)
-#    serverDescription = server.description
-#    numberOfPersons = server.member_count
-#    serverName = server.name
-#    message = f"Le serveur **{serverName}** contient {numberOfPersons} membres.\nLa description du serveur {serverDescription}.\nCe serveur possède {numberOfTextChannels} salon(s) écrit(s) ainsi que {numberOfVoiceChannels} salon(s) vocal.aux."
-#    await contexte.send(message)
-#
-#@bot.command()
-#async def runBot(contexte):
-#    await contexte.send("Envoyez le plat que vous souhaitez cuisiner.")
-#
-#    def check(message):
-#        return message.author == contexte.message.author and contexte.message.channel == message.channel
-#    recette = await bot.wait_for("message", check = check)
-#    message = await contexte.send(f"La préparation de {recette.content} va commencer. Veuillez valider avec ✅. Sinon ❌")
-#    await message.add_reaction("✅")
-#    await message.add_reaction("❌")
-#
-#    def checkEmoji(reaction, user):
-#        return contexte.message.author == user and message.id == reaction.message.id and (str(reaction.emoji) == "✅" or str(reaction.emoji) == "❌")
-#
-#    reaction, user = await bot.wait_for("reaction_add", timeout = 100, check = checkEmoji)
-#
