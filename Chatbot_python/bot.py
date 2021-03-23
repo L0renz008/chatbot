@@ -122,6 +122,10 @@ async def bienvenue(ctx):
 Je suis un serveur virtuel du restaurant et je vais vous accompagner tout au long de votre repas chez nous !\n\
 Veuillez cliquer sur le **numéro** de votre table s\'il vous plaît. Celui-ci est inscrit directement sur la table. Vous allez être redirigé vers le salon propre à votre table. À tout de suite 🧑‍🍳')
     await message.add_reaction('1️⃣')
+    await message.add_reaction('2️⃣')
+    await message.add_reaction('3️⃣')
+    await message.add_reaction('4️⃣')
+    await message.add_reaction('5️⃣')
 
 @bot.event
 async def on_command_error(ctx, error):
