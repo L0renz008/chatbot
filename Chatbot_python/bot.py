@@ -8,6 +8,7 @@ import asyncio
 
 import discord
 from discord.ext import commands
+from discord.ext.commands.converter import UserConverter
 
 from dotenv import load_dotenv
 
@@ -18,18 +19,16 @@ SERVER = os.getenv('DISCORD_SERVER')
 intents = discord.Intents.default()
 intents.members = True
 #client = discord.Client(intents = intents)
-bot = commands.Bot(command_prefix = '!')
+bot = commands.Bot(command_prefix = '!', intents = intents)
 
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
 
-
 @bot.event
 async def on_member_join(member):
-    await member.create_dm()
-    await member.dm_channel.send(
-        f'Hello {member.name} ! Bienvenue sur le serveur dédié aux restaurants !')
+    role = discord.utils.get(member.guild.roles, name = "Client")
+    await member.add_roles(role)
 
 @bot.command(name = 'recette', help = 'Répond avec une recette au hasard.')
 async def recipe(ctx):
@@ -126,6 +125,50 @@ Veuillez cliquer sur le **numéro** de votre table s\'il vous plaît. Celui-ci e
     await message.add_reaction('3️⃣')
     await message.add_reaction('4️⃣')
     await message.add_reaction('5️⃣')
+    
+    def checkUser(reaction, user):
+        #print(ctx.guild.members)
+        return user in ctx.guild.members and message.id == reaction.message.id and message.author != bot.user
+    
+    loop = 0
+    while loop == 0:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", check = checkUser)
+            print('oui')
+            if reaction.emoji == '1️⃣':
+                role = discord.utils.get(ctx.guild.roles, name = "Table 1")
+                await user.add_roles(role)
+                await message.remove_reaction('1️⃣', user)
+            elif reaction.emoji == '2️⃣':
+                role = discord.utils.get(ctx.guild.roles, name = "Table 2")
+                await user.add_roles(role)
+                await message.remove_reaction('2️⃣', user)
+            elif reaction.emoji == '3️⃣':
+                role = discord.utils.get(ctx.guild.roles, name = "Table 3")
+                await user.add_roles(role)
+                await message.remove_reaction('3️⃣', user)
+            elif reaction.emoji == '4️⃣':
+                role = discord.utils.get(ctx.guild.roles, name = "Table 4")
+                await user.add_roles(role)
+                await message.remove_reaction('4️⃣', user)
+            elif reaction.emoji == '5️⃣':
+                role = discord.utils.get(ctx.guild.roles, name = "Table 5")
+                await user.add_roles(role)
+                await message.remove_reaction('5️⃣', user)
+        except asyncio.TimeoutError:
+            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\nRetapez la commande ***!bienvenue***.')
+            loop = 1
+    
+
+@bot.command(name = 'delete', help = 'Supprime les messages pour nettoyer la table.')
+@commands.has_any_role('Admin', 'Serveur')
+async def delete(ctx, number: int = 100):
+    messages = await ctx.channel.history(limit = number).flatten()
+    await ctx.channel.delete_messages(messages)
+
+
+    
+
 
 @bot.event
 async def on_command_error(ctx, error):
