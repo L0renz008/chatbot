@@ -3,7 +3,7 @@
 
 # # Recommandation System
 
-# In[178]:
+# In[349]:
 
 
 import pandas as pd
@@ -13,16 +13,17 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+from joblib import dump, load
 
 
-# In[179]:
+# In[350]:
 
 
 plats = [
     {"id":"11","libélé":"pizza"},
     {"id":"12","libélé":"viande"},
     {"id":"13","libélé":"poisson"},
-    {"id":"14","libélé":"burgers"},
+    {"id":"14","libélé":"burger"},
 ]
 entrees=[
     {"id":"01","libélé":"Tartinade au fromage de chèvre"},
@@ -44,36 +45,36 @@ vins=[
 ]
 
 
-# In[180]:
+# In[351]:
 
 
 #les combinaisons :
 x_train=[
-    [entrees[rd.randrange(0,2)]["libélé"],plats[rd.randrange(0,3)]["libélé"]] for i in range(1000) 
+    [plats[rd.randrange(0,4)]["libélé"]] for i in range(1000) 
 ]
 
 
-# In[181]:
+# In[352]:
 
 
 x_test=[
-        [entrees[rd.randrange(0,2)]["libélé"],plats[rd.randrange(0,3)]["libélé"]] for i in range(100) 
+        [plats[rd.randrange(0,4)]["libélé"]] for i in range(100) 
 ]
 
 
-# In[182]:
+# In[353]:
 
 
 y_train=[]
 for i in x_train:
-    if(i[1]=="pizza"):
+    if(i[0]=="pizza"):
         if(rd.randrange(0,10)<=7):
             y_train.append("tiramisu")
         else:
             y_train.append("cappuccino")
-    if(i[1]=="viande"):
+    if(i[0]=="viande"):
          y_train.append(desserts[rd.randrange(0,2)]["libélé"])
-    if(i[1]=="burger"):
+    if(i[0]=="burger"):
         p=rd.randrange(0,10)
         if(p<5):
             y_train.append("cappuccino")
@@ -81,7 +82,7 @@ for i in x_train:
             y_train.append("fromages")
         if(p>=5 and p<=8):
             y_train.append("tiramisu")
-    if(i[1]=="poisson"):
+    if(i[0]=="poisson"):
         p=rd.randrange(0,10)
         if(p<3):
             y_train.append("cappuccino")
@@ -91,19 +92,19 @@ for i in x_train:
             y_train.append("tiramisu")
 
 
-# In[183]:
+# In[354]:
 
 
 y_test=[]
 for i in x_test:
-    if(i[1]=="pizza"):
+    if(i[0]=="pizza"):
         if(rd.randrange(0,10)<=7):
             y_test.append("tiramisu")
         else:
             y_test.append("cappuccino")
-    if(i[1]=="viande"):
+    if(i[0]=="viande"):
          y_test.append(desserts[rd.randrange(0,2)]["libélé"])
-    if(i[1]=="burger"):
+    if(i[0]=="burger"):
         p=rd.randrange(0,10)
         if(p<5):
             y_test.append("cappuccino")
@@ -111,7 +112,7 @@ for i in x_test:
             y_test.append("fromages")
         if(p>=5 and p<=8):
             y_test.append("tiramisu")
-    if(i[1]=="poisson"):
+    if(i[0]=="poisson"):
         p=rd.randrange(0,10)
         if(p<3):
             y_test.append("cappuccino")
@@ -121,13 +122,13 @@ for i in x_test:
             y_test.append("tiramisu")
 
 
-# In[184]:
+# In[355]:
 
 
 print("x_train =",len(x_train),"y_train =",len(y_train),"x_test =",len(x_test),"y_test =",len(y_test))
 
 
-# In[185]:
+# In[356]:
 
 
 for i in range(len(y_train)):
@@ -136,7 +137,7 @@ for i in range(len(y_test)):
     y_test[i]=[y_test[i]]
 
 
-# In[186]:
+# In[357]:
 
 
 def prepare_inputs(X_train, X_test):
@@ -147,7 +148,7 @@ def prepare_inputs(X_train, X_test):
     return X_train_enc, X_test_enc
 
 
-# In[187]:
+# In[358]:
 
 
 def prepare_targets(y_train, y_test):
@@ -158,7 +159,7 @@ def prepare_targets(y_train, y_test):
     return y_train_enc, y_test_enc
 
 
-# In[188]:
+# In[359]:
 
 
 def inverse_transforme_targets(y_enc, y_train):
@@ -168,14 +169,14 @@ def inverse_transforme_targets(y_enc, y_train):
     return y
 
 
-# In[189]:
+# In[360]:
 
 
 X_train_enc, X_test_enc = prepare_inputs(x_train, x_test)
 y_train_enc, y_test_enc = prepare_targets(y_train, y_test)
 
 
-# In[190]:
+# In[361]:
 
 
 model = Sequential()
@@ -187,13 +188,19 @@ model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy']
 model.fit(X_train_enc, y_train_enc, epochs=100, batch_size=1, verbose=2)
 
 
-# In[191]:
+# In[362]:
+
+
+model.save('/Users/reihan/Downloads')
+
+
+# In[363]:
 
 
 predictions_enc=model.predict(X_test_enc)
 
 
-# In[192]:
+# In[364]:
 
 
 le = OneHotEncoder()
@@ -201,7 +208,7 @@ le.fit(y_train)
 predictions=le.inverse_transform(predictions_enc)
 
 
-# In[193]:
+# In[365]:
 
 
 acc=0
@@ -211,31 +218,31 @@ for i in range(len(y_test)):
 print("accuracy =",acc/len(y_test))
 
 
+# In[366]:
+
+
+X_train_enc
+
+
+# In[367]:
+
+
+x_train
+
+
 # In[ ]:
 
 
 
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[194]:
+# In[368]:
 
 
 y__vins_train_plat=[]
 for i in x_train:
     vin=[]
-    if(i[1]=="pizza"):
+    if(i[0]=="pizza"):
         if(rd.randrange(0,10)<6):
             vin.append("2016 Bandol Tempier")
         elif(rd.randrange(0,10)==7):
@@ -246,7 +253,7 @@ for i in x_train:
             vin.append("rosé pétillant")
         else:
             vin.append("2018 Côtes de Provence")
-    if(i[1]=="viande"):
+    if(i[0]=="viande"):
         if(rd.randrange(0,10)>8):
             vin.append("Blanc de Blanc")
         elif(rd.randrange(0,10)==4):
@@ -255,7 +262,7 @@ for i in x_train:
             vin.append("2016 Alsace Pinot Noir")
         else:
             vin.append("2004 Bandol, Château de Pibarnon")
-    if(i[1]=="poisson"):
+    if(i[0]=="poisson"):
         if(rd.randrange(0,10)<2):
             vin.append("2016 Alsace Pinot Noir")
         elif(rd.randrange(0,10)>=2 and rd.randrange(0,10)<=4):
@@ -266,7 +273,7 @@ for i in x_train:
             vin.append("2004 Bandol, Château de Pibarnon")
         else:
             vin.append("Blanc de Blanc")
-    if(i[1]=="burger"):
+    if(i[0]=="burger"):
         if(rd.randrange(0,10)<4):
             vin.append("2016 Alsace Pinot Noir")
         elif(rd.randrange(0,10)>=4 and rd.randrange(0,10)<=6):
@@ -278,13 +285,13 @@ for i in x_train:
     y__vins_train_plat.append(vin)
 
 
-# In[195]:
+# In[369]:
 
 
 y__vins_test_plat=[]
 for i in x_test:
     vin=[]
-    if(i[1]=="pizza"):
+    if(i[0]=="pizza"):
         if(rd.randrange(0,10)<6):
             vin.append("2016 Bandol Tempier")
         elif(rd.randrange(0,10)==7):
@@ -295,7 +302,7 @@ for i in x_test:
             vin.append("rosé pétillant")
         else:
             vin.append("2018 Côtes de Provence")
-    if(i[1]=="viande"):
+    if(i[0]=="viande"):
         if(rd.randrange(0,10)>8):
             vin.append("Blanc de Blanc")
         elif(rd.randrange(0,10)==4):
@@ -304,7 +311,7 @@ for i in x_test:
             vin.append("2016 Alsace Pinot Noir")
         else:
             vin.append("2004 Bandol, Château de Pibarnon")
-    if(i[1]=="poisson"):
+    if(i[0]=="poisson"):
         if(rd.randrange(0,10)<2):
             vin.append("2016 Alsace Pinot Noir")
         elif(rd.randrange(0,10)>=2 and rd.randrange(0,10)<=4):
@@ -315,7 +322,7 @@ for i in x_test:
             vin.append("2004 Bandol, Château de Pibarnon")
         else:
             vin.append("Blanc de Blanc")
-    if(i[1]=="burger"):
+    if(i[0]=="burger"):
         if(rd.randrange(0,10)<4):
             vin.append("2016 Alsace Pinot Noir")
         elif(rd.randrange(0,10)>=4 and rd.randrange(0,10)<=6):
@@ -327,13 +334,13 @@ for i in x_test:
     y__vins_test_plat.append(vin)
 
 
-# In[196]:
+# In[370]:
 
 
 y_train_vins_enc, y_test_vins_enc = prepare_targets(y__vins_train_plat, y__vins_test_plat)
 
 
-# In[197]:
+# In[371]:
 
 
 model_vins = Sequential()
@@ -345,13 +352,19 @@ model_vins.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accur
 model_vins.fit(X_train_enc, y_train_vins_enc, epochs=20, batch_size=1, verbose=2)
 
 
-# In[198]:
+# In[372]:
+
+
+model.save('/Users/reihan/Downloads')
+
+
+# In[373]:
 
 
 predictions_vins_enc=model_vins.predict(X_test_enc)
 
 
-# In[199]:
+# In[374]:
 
 
 le = OneHotEncoder()
@@ -359,7 +372,7 @@ le.fit(y__vins_train_plat)
 predictions_vins=le.inverse_transform(predictions_vins_enc)
 
 
-# In[200]:
+# In[375]:
 
 
 acc=0
@@ -369,19 +382,19 @@ for i in range(len(y_test)):
 print("accuracy =",acc/len(y_test))
 
 
-# In[ ]:
+# In[385]:
 
 
-
-
-
-# In[ ]:
-
-
-
+model_vins.predict([[1., 0., 0., 0.]])
 
 
 # In[ ]:
+
+
+
+
+
+# In[1]:
 
 
 
