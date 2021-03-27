@@ -409,13 +409,13 @@ from tensorflow import keras
 # In[94]:
 
 
-model = keras.models.load_model('/Users/reihan/Downloads')
+
 
 
 # In[95]:
 
 
-model.predict([[1., 0., 0., 0.]])
+np.argmax(model.predict([[0., 1., 0., 0.]])[0])
 
 
 # In[ ]:

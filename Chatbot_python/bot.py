@@ -10,6 +10,7 @@ from discord.ext import commands
 
 from dotenv import load_dotenv
 
+import numpy as np
 from keras.models import load_model
 
 load_dotenv()
@@ -47,7 +48,7 @@ async def create_channel(ctx, channel_name, category_name = 'SALONS TEXTUELS'):
 
 @bot.command(name = 'hello', help = 'Message de bienvenue et de présentation du bot.')
 async def hello(ctx):
-    await ctx.send('Bienvenue chez **R&L**, le restaurant où toutes les saveurs se rejoignent.\nJe suis un **serveur virtuel** du restaurant. Vous pouvez commander votre repas avec moi en tapant ce que vous désirez. Vous pouvez également me demander d\'afficher le menu avec la commande ***!menu*** ou plus spécifiquement les entrées, plats, desserts et même les vins avec les commandes respectives (***!entrees***, ***!plats***, ***!desserts***, ***!vins***).\nJe peux aussi vous conseiller pour le choix d\'un verre de vin ou d\'un dessert si vous le souhaitez.')
+    await ctx.send('Re-bonjour, vous pouvez me demander d\'afficher le menu avec la commande ***!menu*** ou plus spécifiquement les entrées, plats, desserts et même les vins avec les commandes respectives (***!entrees***, ***!plats***, ***!desserts***, ***!vins***).\nJe peux aussi vous conseiller pour le choix d\'un verre de vin ou d\'un dessert si vous le souhaitez.')
 
 @bot.command(name = 'menu', help = 'Affiche le menu du restaurant')
 async def menu(ctx):
@@ -92,6 +93,24 @@ async def entrees(ctx):
     await message.add_reaction('1️⃣')
     await message.add_reaction('2️⃣')
     await message.add_reaction('3️⃣')
+    
+    message = await ctx.send('Si vous souhaitez commander un plat cliquez sur 🍔, sinon cliquez sur ✅. ')
+    await message.add_reaction('🍔')
+    await message.add_reaction('✅')
+    
+    def checkUser(reaction, user):
+        return ctx.message.author == user and message.id == reaction.message.id
+    
+    loop = 0
+    while loop == 0:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", check = checkUser)
+            if reaction.emoji == '🍔':
+                await plats.invoke(ctx)
+            elif reaction.emoji == '✅':
+                await desserts.invoke(ctx)
+        except:
+            loop = 1
     
 
 @bot.command(name = 'plats', help = 'Affiche les plats à la carte')
@@ -141,15 +160,28 @@ async def recVins(ctx, plat_choisi):
     def checkUserChoice(reaction, user):
         return ctx.message.author == user and message.id == reaction.message.id
     
+    vins = [
+    'Blanc de Blanc',
+    '2016 Alsace Pinot Noir',
+    'rosé pétillant',
+    '2004 Bandol, Château de Pibarnon',
+    '2018 Côtes de Provence',
+    '2016 Bandol Tempier']
+    
     loop = 0
     while loop == 0:
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUserChoice)
             
             if reaction.emoji == '✅':
-                await ctx.send('Et voila le vin qui vous est proposé avec ce plat :')
                 model = load_model('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python/modelbon')
-                print(model.predict([plat_choisi]))
+                predictions = model.predict([plat_choisi])[0]*100
+                meilleur_vin = vins[np.argmax(predictions)]
+                pourcentage = round(max(predictions))
+                if pourcentage >= 60:
+                    await ctx.send(f'Et voilà le vin qui vous est recommandé avec ce plat à hauteur de {pourcentage}% est le {meilleur_vin} !')
+                else:
+                    await ctx.send(f'Et voilà le vin qui vous est recommandé avec ce plat est le {meilleur_vin} ! Bonne dégustation.')
                 
                 
                 
@@ -158,7 +190,6 @@ async def recVins(ctx, plat_choisi):
             elif reaction.emoji == '❌':
                 await ctx.send('Comme vous voulez ! Bon appétit à vous.')
         except asyncio.TimeoutError:
-            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\n Nous en avons déduis que vous ne souhaitiez pas de recommandations.')
             loop = 1
     
     
@@ -200,7 +231,7 @@ async def bienvenue(ctx):
         return
     message = await ctx.send('Bonjour et bienvenue chez **R&L**, le restaurant où toutes les saveurs se rejoignent.\n\
 Je suis un serveur virtuel du restaurant et je vais vous accompagner tout au long de votre repas chez nous !\n\
-Veuillez cliquer sur le **numéro** de votre table s\'il vous plaît. Celui-ci est inscrit directement sur la table. Vous allez être redirigé vers le salon propre à votre table. À tout de suite 🧑‍🍳')
+Veuillez cliquer sur le **numéro** de votre table s\'il vous plaît. Celui-ci est inscrit directement sur la table. Vous allez être redirigé vers le salon propre à votre table.\nN\'hésitez pas à m\'écrire **!hello** à votre arrivée sur la table. À tout de suite 🧑‍🍳')
     await message.add_reaction('1️⃣')
     await message.add_reaction('2️⃣')
     await message.add_reaction('3️⃣')
