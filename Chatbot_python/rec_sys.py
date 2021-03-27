@@ -191,7 +191,7 @@ model.fit(X_train_enc, y_train_enc, epochs=100, batch_size=1, verbose=2)
 # In[362]:
 
 
-model.save('/Users/reihan/Downloads')
+model.save('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python')
 
 
 # In[363]:
@@ -355,7 +355,7 @@ model_vins.fit(X_train_enc, y_train_vins_enc, epochs=20, batch_size=1, verbose=2
 # In[372]:
 
 
-model.save('/Users/reihan/Downloads')
+model.save('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python')
 
 
 # In[373]:
@@ -386,28 +386,4 @@ print("accuracy =",acc/len(y_test))
 
 
 model_vins.predict([[1., 0., 0., 0.]])
-
-
-# In[ ]:
-
-
-
-
-
-# In[1]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
