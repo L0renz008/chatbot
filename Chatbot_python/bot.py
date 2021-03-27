@@ -94,6 +94,8 @@ async def entrees(ctx):
 
 @bot.command(name = 'plats', help = 'Affiche les plats à la carte')
 async def plats(ctx):
+    await ctx.send('Vous pourrez choisir votre plat en cliquant sur le numéro souhaité.\n\
+N\'oubliez pas que seul le dernier choix compte !')
     await ctx.send('Voici la carte des plats :')
     message = await ctx.send('1️⃣ Viande\n\
 2️⃣ Burger\n\
@@ -103,6 +105,29 @@ async def plats(ctx):
     await message.add_reaction('2️⃣')
     await message.add_reaction('3️⃣')
     await message.add_reaction('4️⃣')
+    
+    def checkUser(reaction, user):
+        return ctx.message.author == user and message.id == reaction.message.id
+    plat_choisi = []
+    loop = 0
+    while loop == 0:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUser)
+            if reaction.emoji == '1️⃣':
+                plat_choisi = ['Viande']
+            elif reaction.emoji == '2️⃣':
+                plat_choisi = ['Burger']
+            elif reaction.emoji == '3️⃣':
+                plat_choisi = ['Poisson']
+            elif reaction.emoji == '4️⃣':
+                plat_choisi = ['Pizza']
+            print(plat_choisi)
+        except asyncio.TimeoutError:
+            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\nRetapez la commande ***!menu*** ou l\'une des commandes ***!entrees***, ***!plats***, ***!desserts*** ou ***!vins*** si vous souhaitez accéder de nouveaux aux menus.')
+            loop = 1
+            
+
+    
     
 @bot.command(name = 'desserts', help = 'Affiche les desserts à la carte')
 async def desserts(ctx):
