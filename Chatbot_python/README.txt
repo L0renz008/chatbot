@@ -7,7 +7,7 @@ Le dossier fournit et le git présentent plusieurs fichiers. Le code du chat bot
 Mise en marche et installation :
 Depuis un ordinateur ou un téléphone portable :
 Installez, si ce n’est fait, discord, depuis : https://discord.com/download ou pour un téléphone portable, via l’Apple store (Iphone) ou Playstor (Android).
-Ouvrir l’application Discord puis se rendre sur le serveur restaurant via ce lien : …
+Ouvrir l’application Discord puis se rendre sur le serveur restaurant via ce lien : https://discord.gg/dPt4qCydZS
 Vérifier que la version de python est supérieur ou égale à 3.7.
 Aller sur le terminal et faire “$ pip install -r requirements.txt”
 Lancer le programme python : bot.py 
