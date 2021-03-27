@@ -3,12 +3,10 @@
 #bot = commands.Bot(command_prefix = "!", description = "Bot test")
 
 import os
-import random
 import asyncio
 
 import discord
 from discord.ext import commands
-from discord.ext.commands.converter import UserConverter
 
 from dotenv import load_dotenv
 
@@ -30,19 +28,6 @@ async def on_member_join(member):
     role = discord.utils.get(member.guild.roles, name = "Client")
     await member.add_roles(role)
 
-@bot.command(name = 'recette', help = 'Répond avec une recette au hasard.')
-async def recipe(ctx):
-    if ctx.author == bot.user:
-        return
-    recipes = ['Lasagnes ?', 'Pizza ?', 'Gâteau ?']
-    response = random.choice(recipes)
-    await ctx.send(response)
-    
-@bot.command(name = 'de', help = 'Simule un lancer de dé.')
-async def roll(ctx, nombre_de_de: int, nombre_de_cote: int):
-    dice = [str(random.choice(range(1, nombre_de_cote + 1)))
-            for _ in range(nombre_de_de)]
-    await ctx.send(', '.join(dice))
     
 @bot.command(name = 'create-channel', brief = 'Créer un nouveau channel textuel.', help = 'Créer un nouveau channel textuel. Par défaut dans la catégorie : SALONS TEXTUELS.')
 @commands.has_role('Admin')
@@ -66,7 +51,7 @@ async def hello(ctx):
 async def menu(ctx):
     #, file = discord.File('menu_complet.jpg')
     await ctx.send('Voici le menu complet :')
-    message = await ctx.send('Si vous souhaitez accéder aux différentes cartes, veuillez cliquer sur l\'émoji concerné :\n\t🥗 : Entrées\n\t🍔 : Plats\n\t🍪 : Desserts\n\t🍷 : Vins')
+    message = await ctx.send('Si vous souhaitez accéder aux différents menus, veuillez cliquer sur l\'émoji concerné :\n\t🥗 : Entrées\n\t🍔 : Plats\n\t🍪 : Desserts\n\t🍷 : Vins')
     await message.add_reaction('🥗')
     await message.add_reaction('🍔')
     await message.add_reaction('🍪')
@@ -99,18 +84,52 @@ async def menu(ctx):
 @bot.command(name = 'entrees', help = 'Affiche les entrées à la carte')
 async def entrees(ctx):
     await ctx.send('Voici la carte des entrées :')
+    message = await ctx.send('1️⃣ Tartinade au fromage de chèvre\n\
+2️⃣ Salade jardinière\n\
+3️⃣ Portobello grillé')
+    await message.add_reaction('1️⃣')
+    await message.add_reaction('2️⃣')
+    await message.add_reaction('3️⃣')
+    
 
 @bot.command(name = 'plats', help = 'Affiche les plats à la carte')
 async def plats(ctx):
     await ctx.send('Voici la carte des plats :')
+    message = await ctx.send('1️⃣ Viande\n\
+2️⃣ Burger\n\
+3️⃣ Poisson\n\
+4️⃣ Pizza')
+    await message.add_reaction('1️⃣')
+    await message.add_reaction('2️⃣')
+    await message.add_reaction('3️⃣')
+    await message.add_reaction('4️⃣')
     
 @bot.command(name = 'desserts', help = 'Affiche les desserts à la carte')
 async def desserts(ctx):
     await ctx.send('Voici la carte des desserts :')
+    message = await ctx.send('1️⃣ Tiramisu\n\
+2️⃣ Capuccino\n\
+3️⃣ Fromages')
+    await message.add_reaction('1️⃣')
+    await message.add_reaction('2️⃣')
+    await message.add_reaction('3️⃣')
     
 @bot.command(name = 'vins', help = 'Affiche les vins à la carte')
 async def vins(ctx):
+    #, file = discord.File('carte_vins.jpg')
     await ctx.send('Voici la carte des vins :')
+    message = await ctx.send('1️⃣ Blanc de blanc\n\
+2️⃣ Alsace Pinot Noir 2016\n\
+3️⃣ Rosé pétillant\n\
+4️⃣ Bandol, Château de Pibarnon 2004\n\
+5️⃣ Côtes de Provence 2018\n\
+6️⃣ Bandol Tempier 2016')
+    await message.add_reaction('1️⃣')
+    await message.add_reaction('2️⃣')
+    await message.add_reaction('3️⃣')
+    await message.add_reaction('4️⃣')
+    await message.add_reaction('5️⃣')
+    await message.add_reaction('6️⃣')
 
 @bot.command(name = 'bienvenue', help = 'Message d\'accueil')
 async def bienvenue(ctx):
@@ -127,34 +146,32 @@ Veuillez cliquer sur le **numéro** de votre table s\'il vous plaît. Celui-ci e
     await message.add_reaction('5️⃣')
     
     def checkUser(reaction, user):
-        #print(ctx.guild.members)
-        return user in ctx.guild.members and message.id == reaction.message.id and message.author != bot.user
+        return user in ctx.guild.members and message.id == reaction.message.id
     
     loop = 0
     while loop == 0:
         try:
             reaction, user = await bot.wait_for("reaction_add", check = checkUser)
-            print('oui')
             if reaction.emoji == '1️⃣':
                 role = discord.utils.get(ctx.guild.roles, name = "Table 1")
                 await user.add_roles(role)
-                await message.remove_reaction('1️⃣', user)
+                #await message.remove_reaction('1️⃣', user)
             elif reaction.emoji == '2️⃣':
                 role = discord.utils.get(ctx.guild.roles, name = "Table 2")
                 await user.add_roles(role)
-                await message.remove_reaction('2️⃣', user)
+                #await message.remove_reaction('2️⃣', user)
             elif reaction.emoji == '3️⃣':
                 role = discord.utils.get(ctx.guild.roles, name = "Table 3")
                 await user.add_roles(role)
-                await message.remove_reaction('3️⃣', user)
+                #await message.remove_reaction('3️⃣', user)
             elif reaction.emoji == '4️⃣':
                 role = discord.utils.get(ctx.guild.roles, name = "Table 4")
                 await user.add_roles(role)
-                await message.remove_reaction('4️⃣', user)
+                #await message.remove_reaction('4️⃣', user)
             elif reaction.emoji == '5️⃣':
                 role = discord.utils.get(ctx.guild.roles, name = "Table 5")
                 await user.add_roles(role)
-                await message.remove_reaction('5️⃣', user)
+                #await message.remove_reaction('5️⃣', user)
         except asyncio.TimeoutError:
             await ctx.send('Vous ne pouvez plus réagir avec les émojis.\nRetapez la commande ***!bienvenue***.')
             loop = 1
