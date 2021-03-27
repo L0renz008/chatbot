@@ -1,0 +1,12 @@
+os
+random
+asyncio
+discord
+dotenv
+joblib
+sklearn.ensemble
+pandas
+numpy
+sklearn.preprocessing
+tensorflow
+tensorflow.keras
