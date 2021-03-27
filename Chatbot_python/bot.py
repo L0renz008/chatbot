@@ -10,6 +10,8 @@ from discord.ext import commands
 
 from dotenv import load_dotenv
 
+from keras.models import load_model
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 SERVER = os.getenv('DISCORD_SERVER')
@@ -115,13 +117,13 @@ N\'oubliez pas que seul le dernier choix compte ! Cliquez sur ✅ quand vous ave
         try:
             reaction, user = await bot.wait_for("reaction_add", check = checkUser)
             if reaction.emoji == '1️⃣':
-                plat_choisi = [1, 0, 0, 0]
+                plat_choisi = [1., 0., 0., 0.]
             elif reaction.emoji == '2️⃣':
-                plat_choisi = [0, 1, 0, 0]
+                plat_choisi = [0., 1., 0., 0.]
             elif reaction.emoji == '3️⃣':
-                plat_choisi = [0, 0, 1, 0]
+                plat_choisi = [0., 0., 1., 0.]
             elif reaction.emoji == '4️⃣':
-                plat_choisi = [0, 0, 0, 1]
+                plat_choisi = [0., 0., 0., 1.]
             elif reaction.emoji == '✅':
                 await ctx.invoke(bot.get_command('recVins'), plat_choisi = plat_choisi)
         except asyncio.TimeoutError:
@@ -142,11 +144,17 @@ async def recVins(ctx, plat_choisi):
     loop = 0
     while loop == 0:
         try:
-            
             reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUserChoice)
             
             if reaction.emoji == '✅':
                 await ctx.send('Et voila le vin qui vous est proposé avec ce plat :')
+                print(plat_choisi)
+                model = load_model('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python')
+                print(model.predict([plat_choisi]))
+                
+                
+                
+                
             elif reaction.emoji == '❌':
                 await ctx.send('Comme vous voulez ! Bon appétit à vous.')
         except asyncio.TimeoutError:
@@ -239,8 +247,6 @@ async def delete(ctx, number: int = 100):
 
 
     
-
-
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
