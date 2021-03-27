@@ -1,7 +1,3 @@
-#import discord
-#from discord.ext import commands
-#bot = commands.Bot(command_prefix = "!", description = "Bot test")
-
 import os
 import asyncio
 
@@ -19,7 +15,7 @@ SERVER = os.getenv('DISCORD_SERVER')
 
 intents = discord.Intents.default()
 intents.members = True
-#client = discord.Client(intents = intents)
+
 bot = commands.Bot(command_prefix = '!', intents = intents)
 
 @bot.event
@@ -184,18 +180,11 @@ async def recVins(ctx, plat_choisi):
                     await ctx.send(f'Et voilà le vin qui vous est recommandé avec ce plat est le {meilleur_vin} ! Bonne dégustation.')
                 
                 
-                
-                
-                
             elif reaction.emoji == '❌':
                 await ctx.send('Comme vous voulez ! Bon appétit à vous.')
         except asyncio.TimeoutError:
             loop = 1
     
-    
-    
-            
- 
     
 @bot.command(name = 'desserts', help = 'Affiche les desserts à la carte')
 async def desserts(ctx):
