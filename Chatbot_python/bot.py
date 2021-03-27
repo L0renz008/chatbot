@@ -63,7 +63,7 @@ async def menu(ctx):
     loop = 0
     while loop == 0:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUser)
+            reaction, user = await bot.wait_for("reaction_add", check = checkUser)
             if reaction.emoji == '🥗':
                 await entrees.invoke(ctx)
                 await message.remove_reaction('🥗', user)
@@ -95,7 +95,7 @@ async def entrees(ctx):
 @bot.command(name = 'plats', help = 'Affiche les plats à la carte')
 async def plats(ctx):
     await ctx.send('Vous pourrez choisir votre plat en cliquant sur le numéro souhaité.\n\
-N\'oubliez pas que seul le dernier choix compte !')
+N\'oubliez pas que seul le dernier choix compte ! Cliquez sur ✅ quand vous avez terminé.')
     await ctx.send('Voici la carte des plats :')
     message = await ctx.send('1️⃣ Viande\n\
 2️⃣ Burger\n\
@@ -105,6 +105,7 @@ N\'oubliez pas que seul le dernier choix compte !')
     await message.add_reaction('2️⃣')
     await message.add_reaction('3️⃣')
     await message.add_reaction('4️⃣')
+    await message.add_reaction('✅')
     
     def checkUser(reaction, user):
         return ctx.message.author == user and message.id == reaction.message.id
@@ -112,22 +113,50 @@ N\'oubliez pas que seul le dernier choix compte !')
     loop = 0
     while loop == 0:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUser)
+            reaction, user = await bot.wait_for("reaction_add", check = checkUser)
             if reaction.emoji == '1️⃣':
-                plat_choisi = ['Viande']
+                plat_choisi = [1, 0, 0, 0]
             elif reaction.emoji == '2️⃣':
-                plat_choisi = ['Burger']
+                plat_choisi = [0, 1, 0, 0]
             elif reaction.emoji == '3️⃣':
-                plat_choisi = ['Poisson']
+                plat_choisi = [0, 0, 1, 0]
             elif reaction.emoji == '4️⃣':
-                plat_choisi = ['Pizza']
-            print(plat_choisi)
+                plat_choisi = [0, 0, 0, 1]
+            elif reaction.emoji == '✅':
+                await ctx.invoke(bot.get_command('recVins'), plat_choisi = plat_choisi)
         except asyncio.TimeoutError:
-            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\nRetapez la commande ***!menu*** ou l\'une des commandes ***!entrees***, ***!plats***, ***!desserts*** ou ***!vins*** si vous souhaitez accéder de nouveaux aux menus.')
+            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\nRetapez la commande ***!plats*** ou l\'une des commandes ***!entrees***, ***!menu***, ***!desserts*** ou ***!vins*** si vous souhaitez accéder de nouveaux aux menus.')
             loop = 1
-            
-
     
+            
+@bot.command(name = 'recVins', help = 'Recommande un vin pour le plat.')
+async def recVins(ctx, plat_choisi):
+    await ctx.send('Vous avez fait votre choix. Souhaitez-vous avoir une recommandation de vins avec votre plat ?')
+    message = await ctx.send('✅ Oui / ❌ Non')
+    await message.add_reaction('✅')
+    await message.add_reaction('❌')
+    
+    def checkUserChoice(reaction, user):
+        return ctx.message.author == user and message.id == reaction.message.id
+    
+    loop = 0
+    while loop == 0:
+        try:
+            
+            reaction, user = await bot.wait_for("reaction_add", timeout = 60, check = checkUserChoice)
+            
+            if reaction.emoji == '✅':
+                await ctx.send('Et voila le vin qui vous est proposé avec ce plat :')
+            elif reaction.emoji == '❌':
+                await ctx.send('Comme vous voulez ! Bon appétit à vous.')
+        except asyncio.TimeoutError:
+            await ctx.send('Vous ne pouvez plus réagir avec les émojis.\n Nous en avons déduis que vous ne souhaitiez pas de recommandations.')
+            loop = 1
+    
+    
+    
+            
+ 
     
 @bot.command(name = 'desserts', help = 'Affiche les desserts à la carte')
 async def desserts(ctx):
