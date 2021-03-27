@@ -148,9 +148,9 @@ async def recVins(ctx, plat_choisi):
             
             if reaction.emoji == '✅':
                 await ctx.send('Et voila le vin qui vous est proposé avec ce plat :')
-                print(plat_choisi)
-                model = load_model('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python')
+                model = load_model('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python/modelbon')
                 print(model.predict([plat_choisi]))
+                
                 
                 
                 
