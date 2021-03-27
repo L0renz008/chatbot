@@ -2,6 +2,8 @@
 Python Chatbot
 Mode d’emploi utilisateur Chat bot restaurant
 
+AVANT TOUTES CHOSE, POUR LANCER LE BOT, VEUILLEZ AVOIR INSTALLER TOUS LES REQUIREMENTS NÉCESSAIRES ET ENSUITE, DANS UN TERMINAL SE SITUANT DANS LE DOSSIER "Chatbot_python" VEUILLEZ LANCER LA COMMANDE SUIVANTE : python3 bot.py
+CECI AURA POUR EFFET DE RENDRE LE CHATBOT ACTIF ET APTE À RÉPONDRE À VOS MESSAGES.
 
 Le dossier fournit et le git présentent plusieurs fichiers. Le code du chat bot qui intègre la recommandation système est dans bot.py. Le dossier rec_sys.py est le code complet du modèle de prédiction de “recommandation système”.  Les deux modèles créés et importée dans le bot : model_vins et model_desserts. Enfin il y a le read_me.
 
