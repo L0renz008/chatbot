@@ -185,13 +185,13 @@ model.add(Dense(y_train_enc.shape[1], activation='sigmoid'))
 # compile the keras model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 # fit the keras model on the dataset
-model.fit(X_train_enc, y_train_enc, epochs=100, batch_size=1, verbose=2)
+model.fit(X_train_enc, y_train_enc, epochs=1, batch_size=1, verbose=2)
 
 
 # In[75]:
 
 
-model.save('/Users/reihan/Downloads/model.h5')
+model.save('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python/modeldessert')
 
 
 # In[76]:
@@ -355,7 +355,7 @@ model_vins.fit(X_train_enc, y_train_vins_enc, epochs=20, batch_size=1, verbose=2
 # In[100]:
 
 
-model_vins.save('/Users/reihan/Downloads')
+model_vins.save('/Users/lorenzorenouvin/Desktop/GitHub/chatbot/Chatbot_python/modelbon')
 
 
 # In[101]:
